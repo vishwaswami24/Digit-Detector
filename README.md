@@ -9,7 +9,7 @@
 
 Handwritten digit recognition web app built with Flask, scikit-learn, and an interactive canvas UI.
 
-![bg](image-source-url-or-path)
+![bg](Screenshot 2026-03-14 121149.png)
 
 ## Overview
 
