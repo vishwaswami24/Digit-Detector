@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f6f0e1">
+    <title>Adaptive Digit Studio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="page-shell">
+        <nav class="topbar" aria-label="Primary">
+            <div class="brand-lockup">
+                <span class="brand-mark">DD</span>
+                <div class="brand-copy">
+                    <p class="brand-kicker">Digit Detector</p>
+                    <span class="brand-title">Adaptive Digit Studio</span>
+                </div>
+            </div>
+
+            <div class="topbar-links">
+                <a href="#canvasLab">Canvas</a>
+                <a href="#feedbackLab">Feedback</a>
+                <a href="#statsLab">Stats</a>
+            </div>
+        </nav>
+
+        <header class="hero">
+            <div class="hero-copy">
+                <p class="eyebrow">Handwritten digit lab</p>
+                <h1>Train with every sketch.</h1>
+                <p class="hero-text">
+                    Draw a number, inspect the model's confidence, and save corrections
+                    without giving half the screen to the headline.
+                </p>
+            </div>
+
+            <div class="hero-status">
+                <div class="status-card">
+                    <span class="status-label">System status</span>
+                    <strong id="healthBadge" class="status-value">Checking model...</strong>
+                    <span id="healthDetail" class="status-detail">Collecting diagnostics</span>
+                </div>
+
+                <div class="shortcut-card">
+                    <span class="status-label">Keyboard</span>
+                    <p><kbd>C</kbd> clear <kbd>Enter</kbd> predict <kbd>R</kbd> retrain</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <section id="canvasLab" class="panel draw-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Canvas</p>
+                        <h2>Sketch one digit</h2>
+                    </div>
+                    <p class="panel-copy">Use a bold stroke and leave a little breathing room around the shape.</p>
+                </div>
+
+                <div class="canvas-stage">
+                    <div class="canvas-frame">
+                        <canvas id="drawingCanvas" width="280" height="280" aria-label="Digit drawing canvas"></canvas>
+                        <div class="canvas-guides" aria-hidden="true"></div>
+                    </div>
+
+                    <p id="canvasHint" class="canvas-hint">Start drawing to unlock prediction.</p>
+
+                    <div class="canvas-controls">
+                        <button id="clearBtn" class="btn btn-secondary" type="button">Clear canvas</button>
+                        <button id="predictBtn" class="btn btn-primary" type="button">Predict digit</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel insight-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Prediction</p>
+                        <h2>Confidence snapshot</h2>
+                    </div>
+                    <p class="panel-copy" id="predictionNarrative">Run a prediction to see how the model is reasoning.</p>
+                </div>
+
+                <div class="metric-stack">
+                    <div class="hero-number" id="digitDisplay">--</div>
+                    <div class="metric-caption">Top guess</div>
+                </div>
+
+                <div class="confidence-block">
+                    <div class="confidence-row">
+                        <span>Confidence</span>
+                        <strong id="confidenceValue">0%</strong>
+                    </div>
+                    <div class="confidence-track" aria-hidden="true">
+                        <span id="confidenceFill"></span>
+                    </div>
+                </div>
+
+                <div class="top-picks" id="topPredictions"></div>
+                <div class="probabilities-list" id="probabilitiesGrid"></div>
+            </section>
+
+            <section id="feedbackLab" class="panel feedback-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Feedback</p>
+                        <h2>Teach the recognizer</h2>
+                    </div>
+                    <p class="panel-copy">Confirm the guess or pick the digit it should have seen.</p>
+                </div>
+
+                <p id="feedbackPrompt" class="feedback-copy">Make a prediction to unlock feedback controls.</p>
+
+                <div class="feedback-actions">
+                    <button id="rightBtn" class="btn btn-success" type="button" disabled>Yes, that's right</button>
+                    <button id="wrongBtn" class="btn btn-outline" type="button" disabled>Correct it</button>
+                </div>
+
+                <div id="correctionPanel" class="correction-panel" hidden>
+                    <p>Select the correct digit.</p>
+                    <div id="digitSelector" class="digit-selector"></div>
+                </div>
+
+                <div id="feedbackSuccess" class="message-banner success-banner" hidden aria-live="polite"></div>
+            </section>
+
+            <section id="statsLab" class="panel stats-panel wide-panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="eyebrow">Feedback ledger</p>
+                        <h2>How the model is trending</h2>
+                    </div>
+                    <p class="panel-copy">Saved confirmations and corrections update these metrics live.</p>
+                </div>
+
+                <div class="stat-grid">
+                    <article class="stat-card">
+                        <span class="stat-label">Feedback saved</span>
+                        <strong id="totalFeedback">0</strong>
+                    </article>
+
+                    <article class="stat-card">
+                        <span class="stat-label">Corrections</span>
+                        <strong id="correctionsCount">0</strong>
+                    </article>
+
+                    <article class="stat-card">
+                        <span class="stat-label">Agreement rate</span>
+                        <strong id="agreementRate">0%</strong>
+                    </article>
+
+                    <article class="stat-card">
+                        <span class="stat-label">Avg confidence</span>
+                        <strong id="averageConfidence">0%</strong>
+                    </article>
+                </div>
+            </section>
+
+            <section class="panel retrain-panel wide-panel">
+                <div class="retrain-copy">
+                    <p class="eyebrow">Model refresh</p>
+                    <h2>Retrain on reference data plus saved feedback</h2>
+                    <p id="retrainMeta" class="panel-copy">
+                        Retraining uses a cached MNIST subset when available, then blends
+                        in your saved corrections.
+                    </p>
+                </div>
+
+                <button id="retrainBtn" class="btn btn-primary" type="button">Retrain model</button>
+            </section>
+
+            <div id="loading" class="loading-card wide-panel" hidden>
+                <div class="spinner" aria-hidden="true"></div>
+                <p id="loadingText">Analyzing sketch...</p>
+            </div>
+
+            <div id="errorMessage" class="message-banner error-banner wide-panel" hidden aria-live="polite"></div>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
