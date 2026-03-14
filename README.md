@@ -9,6 +9,8 @@
 
 Handwritten digit recognition web app built with Flask, scikit-learn, and an interactive canvas UI.
 
+https://github.com/vishwaswami24/Digit-Detector/blob/main/ScreenRecording2026-03-13205301-ezgif.com-video-to-gif-converter.gif
+
 ## Overview
 
 Digit Detector lets you:
