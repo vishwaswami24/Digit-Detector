@@ -9,7 +9,7 @@
 
 Handwritten digit recognition web app built with Flask, scikit-learn, and an interactive canvas UI.
 
-
+![Screenshot](https://raw.githubusercontent.com/vishwaswami24/Digit-Detector/main/Screenshot%202026-03-14%20121149.png)
 
 ## Overview
 
